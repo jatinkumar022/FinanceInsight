@@ -83,7 +83,6 @@ const Profile: React.FC = () => {
   ): Promise<void> => {
     try {
       // Log the croppedAreaPixels to debug
-      console.log("Cropped Area Pixels:", croppedAreaPixels, croppedArea);
 
       const croppedImg = await getCroppedImg(image!, croppedAreaPixels);
       setCroppedImage(croppedImg);
