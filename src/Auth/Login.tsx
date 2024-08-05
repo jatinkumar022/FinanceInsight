@@ -57,6 +57,8 @@ const Login = () => {
         navigate("/");
       })
       .catch((error) => {
+        console.log(error);
+
         const errorMessage = error.message;
         toast({ variant: "destructive", title: errorMessage });
         setLoading(false);

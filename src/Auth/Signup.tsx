@@ -114,6 +114,7 @@ const Signup = () => {
         navigate("/");
       })
       .catch((error) => {
+        console.log(error);
         const errorMessage =
           (error as Error).message || "An unknown error occurred";
         toast({ variant: "destructive", title: errorMessage });
