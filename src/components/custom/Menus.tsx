@@ -20,7 +20,7 @@ const Menus = () => {
         <NavLink
           to={"/"}
           className={({ isActive }) =>
-            isActive ? "z-10 text-cs_yellow" : "z-10  text-cs_gray"
+            isActive ? "z-10 text-cs_yellow  px-6 " : "z-10  text-cs_gray px-6"
           }
         >
           <Home04Icon />
@@ -45,7 +45,7 @@ const Menus = () => {
         <NavLink
           to={"/profile"}
           className={({ isActive }) =>
-            isActive ? "z-10 text-cs_yellow " : "z-10  text-cs_gray"
+            isActive ? "z-10 text-cs_yellow px-6" : "z-10  text-cs_gray px-6"
           }
         >
           <Settings01Icon />
