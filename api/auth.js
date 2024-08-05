@@ -15,8 +15,9 @@ export async function GET(request) {
   try {
     const { tokens } = await client.getToken(code);
     // Process tokens and store user session here
-    // Redirect to your frontend application
-    return NextResponse.redirect('/dashboard');
+    // Example: Save tokens in a cookie or database, then redirect to frontend app
+    // await saveTokens(tokens);
+    return NextResponse.redirect('/dashboard'); // Adjust to match your app's routing
   } catch (error) {
     console.error('Error exchanging code for tokens:', error);
     return NextResponse.json({ error: 'Authentication failed' }, { status: 500 });

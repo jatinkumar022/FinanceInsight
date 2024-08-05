@@ -57,7 +57,6 @@ const Signup = () => {
 
   const handleSignup = async (user: z.infer<typeof SignupValidation>) => {
     setLoading(true);
-    console.log("User Data:", user);
     form.reset();
 
     try {
@@ -72,12 +71,12 @@ const Signup = () => {
       await createDoc(newUser, user.name);
 
       toast({ variant: "success", description: "User created!" });
-      setLoading(false);
       navigate("/");
     } catch (error) {
       const errorMessage =
         (error as Error).message || "An unknown error occurred";
       toast({ variant: "destructive", title: errorMessage });
+    } finally {
       setLoading(false);
     }
   };
@@ -118,6 +117,8 @@ const Signup = () => {
         const errorMessage =
           (error as Error).message || "An unknown error occurred";
         toast({ variant: "destructive", title: errorMessage });
+      })
+      .finally(() => {
         setLoading(false);
       });
   }
