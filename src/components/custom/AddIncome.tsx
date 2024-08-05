@@ -146,8 +146,9 @@ export function AddIncome() {
               </Label>
               <Input
                 id="amount"
+                type="number"
                 placeholder="example: ₹35000"
-                className="col-span-3"
+                className="col-span-3 [&::-webkit-inner-spin-button]:appearance-none [appearance:textfield]"
                 {...register("amount", {
                   required: "Amount is required",
                   pattern: {

@@ -12,6 +12,18 @@ import { getFirestore, doc, updateDoc, getDoc } from "firebase/firestore";
 import { PlusIcon } from "lucide-react";
 import Cropper from "react-easy-crop";
 import getCroppedImg from "@/components/ui/cropImage"; // Utility function for cropping
+import { FaEye } from "react-icons/fa";
+
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 interface UserProfile {
   profilePic?: string;
@@ -30,9 +42,15 @@ const Profile: React.FC = () => {
     width: number;
     height: number;
   }>({
-    width: 500,
-    height: 500,
+    width: window.innerWidth < 768 ? 180 : 300, // Smaller width for mobile
+    height: window.innerWidth < 768 ? 180 : 300, // Smaller height for mobile
   });
+
+  function toScientificNotation(num: any) {
+    const numStr = num.toString();
+    // Convert to scientific notation only if the length of the number string is greater than 22
+    return numStr.length > 22 ? num.toExponential(2) : numStr;
+  }
 
   useEffect(() => {
     if (user) {
@@ -54,46 +72,61 @@ const Profile: React.FC = () => {
     if (event.target.files && event.target.files[0]) {
       const file = event.target.files[0];
       setImage(URL.createObjectURL(file));
+      setCroppedImage(null); // Reset cropped image on new upload
       setCropperOpen(true);
     }
   };
 
-  const handleCropComplete = async (croppedAreaPixels: any): Promise<void> => {
-    console.log("Cropped area pixels:", croppedAreaPixels); // Add this line
+  const handleCropComplete = async (
+    croppedArea: any,
+    croppedAreaPixels: any
+  ): Promise<void> => {
     try {
+      // Log the croppedAreaPixels to debug
+      console.log("Cropped Area Pixels:", croppedAreaPixels, croppedArea);
+
       const croppedImg = await getCroppedImg(image!, croppedAreaPixels);
       setCroppedImage(croppedImg);
     } catch (error) {
       console.error("Error cropping image:", error);
     }
   };
+
   const handleUpload = async (): Promise<void> => {
     if (!croppedImage || !user) return;
 
-    const storage = getStorage();
-    const storageRef = ref(
-      storage,
-      `profile-pics/${user.uid}/${Date.now()}.jpg`
-    );
+    try {
+      const storage = getStorage();
+      const storageRef = ref(
+        storage,
+        `profile-pics/${user.uid}/${Date.now()}.jpg`
+      );
 
-    // Convert base64 to Blob
-    const response = await fetch(croppedImage);
-    const blob = await response.blob();
+      // Convert base64 to Blob
+      const response = await fetch(croppedImage);
+      const blob = await response.blob();
 
-    // Upload the file
-    await uploadBytes(storageRef, blob);
+      // Upload the file
+      await uploadBytes(storageRef, blob);
 
-    // Get the download URL
-    const downloadURL = await getDownloadURL(storageRef);
-    setProfilePicUrl(downloadURL);
+      // Get the download URL
+      const downloadURL = await getDownloadURL(storageRef);
+      setProfilePicUrl(downloadURL);
 
-    // Update Firestore with the new profile picture URL
-    const db = getFirestore();
-    const userRef = doc(db, `users/${user.uid}`);
-    await updateDoc(userRef, { profilePic: downloadURL });
+      // Update Firestore with the new profile picture URL
+      const db = getFirestore();
+      const userRef = doc(db, `users/${user.uid}`);
+      await updateDoc(userRef, { profilePic: downloadURL });
 
-    toast({ variant: "success", title: "Profile picture updated!" });
-    setCropperOpen(false);
+      toast({ variant: "success", title: "Profile picture updated!" });
+      setCropperOpen(false);
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      toast({
+        variant: "destructive",
+        title: "Failed to upload profile picture",
+      });
+    }
   };
 
   const navigate = useNavigate();
@@ -146,19 +179,58 @@ const Profile: React.FC = () => {
           </div>
 
           <div className="px-4 pt-4 mb-6">Your Current Balance:</div>
-          <div className="relative ">
-            <img src={Card} alt="Card" className="rounded-xl" />
-            <div className="absolute top-12 left-32 text-white">
-              <div className="text-xs">Balance</div>
-              <div className="text-3xl">₹{balance.toFixed(2)}</div>
+          <div className="relative">
+            <img
+              src={Card}
+              alt="Card"
+              className="rounded-xl w-full max-w-[320px] h-auto"
+            />
+            <div className="absolute top-12 left-44  transform -translate-x-1/2 text-white text-center">
+              <div className="text-xs cursor-default">
+                Click to check Balance
+              </div>
+              <div className="text-3xl overflow-hidden whitespace-nowrap text-ellipsis max-w-[150px]">
+                {/* Display balance, limited to 8 characters */}
+                {/* {`₹${balance}} */}
+                <div className="  p-1 text-center w-max mt-2 cursor-pointer bg-slate-900 rounded-full focus:animate-out ">
+                  {}
+
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <FaEye size={20} />
+                    </DialogTrigger>
+                    <DialogContent className=" w-max ">
+                      <DialogHeader>
+                        <DialogTitle>Your Current Balance:</DialogTitle>
+                      </DialogHeader>
+                      <div className="flex items-center space-x-2">
+                        <div className="grid flex-1 gap-2">
+                          <div className="w-full text-2xl p-2">
+                            {toScientificNotation(balance)}
+                          </div>
+                        </div>
+                      </div>
+                      <DialogFooter className="sm:justify-start">
+                        <DialogClose asChild>
+                          <Button type="button" variant="secondary">
+                            Close
+                          </Button>
+                        </DialogClose>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+              </div>
             </div>
-            <div className="absolute text-sm bottom-5 left-32 text-white">
-              <div>{user?.displayName || "User Name"}</div>
+            <div className="absolute bottom-5 left-1/2 transform -translate-x-1/2 text-white text-center">
+              <div className="text-sm truncate">
+                {user?.displayName || "User Name"}
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="mb-16 m-5 p-10 flex items-center justify-center">
+        <div className="mb-16  m-5 p-10 flex items-center justify-center">
           {user && (
             <button
               className="flex gap-1 items-center text-red-600"
@@ -169,30 +241,40 @@ const Profile: React.FC = () => {
           )}
         </div>
 
+        {/* Cropper Modal */}
         {cropperOpen && (
-          <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
+          <div className="fixed inset-0 mb-20 bg-black bg-opacity-50 flex items-center justify-center">
             <div
-              className="bg-white p-4 rounded-lg relative"
-              style={{ width: cropperSize.width, height: cropperSize.height }}
+              className="relative bg-white p-4 rounded-lg"
+              style={{
+                width: cropperSize.width + 30,
+                height: cropperSize.height + 80,
+              }}
             >
-              <Cropper
-                image={image!}
-                crop={crop}
-                zoom={zoom}
-                aspect={1}
-                onCropChange={setCrop}
-                onZoomChange={setZoom}
-                onCropComplete={handleCropComplete}
-              />
-              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex justify-between w-full px-4">
+              <div
+                style={{ width: cropperSize.width, height: cropperSize.height }}
+              >
+                {image && (
+                  <Cropper
+                    image={image}
+                    crop={crop}
+                    zoom={zoom}
+                    aspect={1}
+                    onCropChange={setCrop}
+                    onZoomChange={setZoom}
+                    onCropComplete={handleCropComplete}
+                  />
+                )}
+              </div>
+              <div className="absolute  inset-x-0 -bottom-14  flex gap-2 items-center px-4">
                 <button
-                  className="bg-gray-500 text-white p-2 rounded"
+                  className="bg-gray-500 text-white py-2 px-2 rounded-md w-full"
                   onClick={() => setCropperOpen(false)}
                 >
                   Cancel
                 </button>
                 <button
-                  className="bg-blue-500 text-white p-2 rounded"
+                  className="bg-yellow-400 text-white py-2 px-2 rounded-md w-full"
                   onClick={handleUpload}
                 >
                   Upload

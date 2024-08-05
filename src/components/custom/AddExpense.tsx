@@ -150,7 +150,8 @@ export function AddExpense() {
               <Input
                 id="amount"
                 placeholder="example: ₹5000"
-                className="col-span-3"
+                type="number"
+                className="col-span-3 [&::-webkit-inner-spin-button]:appearance-none [appearance:textfield]"
                 {...register("amount", {
                   required: "Amount is required",
                   pattern: {
