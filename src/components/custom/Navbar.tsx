@@ -78,10 +78,10 @@ const Navbar: React.FC<NavbarProps> = ({ username }) => {
         <img
           className="p-[1px] rounded-full"
           src={
-            profilePicUrl ||
-            "https://avataaars.io/?avatarStyle=Transparent&topType=ShortHairShaggyMullet&accessoriesType=Sunglasses&hairColor=Black&facialHairType=BeardMajestic&facialHairColor=Black&clotheType=BlazerShirt&eyeType=Default&eyebrowType=AngryNatural&mouthType=Serious&skinColor=Light"
+            profilePicUrl
+              ? profilePicUrl
+              : "https://avataaars.io/?avatarStyle=Transparent&topType=ShortHairShaggyMullet&accessoriesType=Sunglasses&hairColor=Black&facialHairType=BeardMajestic&facialHairColor=Black&clotheType=BlazerShirt&eyeType=Default&eyebrowType=AngryNatural&mouthType=Serious&skinColor=Light"
           }
-          alt="Avatar"
         />
       </Link>
     </div>

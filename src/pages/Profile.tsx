@@ -152,8 +152,9 @@ const Profile: React.FC = () => {
                 <img
                   className="w-full p-2 h-full rounded-full border-2 border-yellow-400"
                   src={
-                    profilePicUrl ||
-                    "https://avataaars.io/?avatarStyle=Transparent&topType=ShortHairShaggyMullet&accessoriesType=Sunglasses&hairColor=Black&facialHairType=BeardMajestic&facialHairColor=Black&clotheType=BlazerShirt&eyeType=Default&eyebrowType=AngryNatural&mouthType=Serious&skinColor=Light"
+                    profilePicUrl
+                      ? profilePicUrl
+                      : "https://avataaars.io/?avatarStyle=Transparent&topType=ShortHairShaggyMullet&accessoriesType=Sunglasses&hairColor=Black&facialHairType=BeardMajestic&facialHairColor=Black&clotheType=BlazerShirt&eyeType=Default&eyebrowType=AngryNatural&mouthType=Serious&skinColor=Light"
                   }
                   alt="Profile Image"
                 />
