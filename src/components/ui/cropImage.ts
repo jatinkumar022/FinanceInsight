@@ -1,4 +1,7 @@
-export default function getCroppedImg(imageSrc: any, pixelCrop: any) {
+export default function getCroppedImg(
+  imageSrc: string,
+  pixelCrop: any
+): Promise<string> {
   return new Promise((resolve, reject) => {
     const image = new Image();
     image.src = imageSrc;

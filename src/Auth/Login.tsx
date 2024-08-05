@@ -15,11 +15,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-  GoogleAuthProvider,
-  signInWithEmailAndPassword,
-  signInWithPopup,
-} from "firebase/auth";
+import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { auth, db, doc, provider, setDoc } from "@/db/firebase";
 import ReactLoading from "react-loading";
 import { useState } from "react";
@@ -54,9 +50,7 @@ const Login = () => {
     form.reset();
 
     signInWithEmailAndPassword(auth, user.email, user.password)
-      .then((userCredential) => {
-        // login
-        const user = userCredential.user;
+      .then(() => {
         toast({ variant: "success", description: "Login Success!" });
 
         setLoading(false);
@@ -102,8 +96,7 @@ const Login = () => {
       signInWithPopup(auth, provider)
         .then((result) => {
           // This gives you a Google Access Token. You can use it to access the Google API.
-          const credential = GoogleAuthProvider.credentialFromResult(result);
-          const token = credential?.accessToken;
+
           // The signed-in user info.
           const user = result.user;
           // IdP data available using getAdditionalUserInfo(result)
@@ -117,7 +110,7 @@ const Login = () => {
         })
         .catch((error) => {
           // Handle Errors here.
-          const errorCode = error.code;
+
           const errorMessage = error.message;
           toast({ variant: "destructive", title: errorMessage });
           setLoading(false);

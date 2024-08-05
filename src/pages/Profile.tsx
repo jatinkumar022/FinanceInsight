@@ -13,6 +13,10 @@ import { PlusIcon } from "lucide-react";
 import Cropper from "react-easy-crop";
 import getCroppedImg from "@/components/ui/cropImage"; // Utility function for cropping
 
+interface UserProfile {
+  profilePic?: string;
+}
+
 const Profile: React.FC = () => {
   const [user] = useAuthState(auth);
   const { balance, fetchTransactions } = useTransactionStore();
@@ -22,7 +26,7 @@ const Profile: React.FC = () => {
   const [crop, setCrop] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const [zoom, setZoom] = useState<number>(1);
   const [cropperOpen, setCropperOpen] = useState<boolean>(false);
-  const [cropperSize, setCropperSize] = useState<{
+  const [cropperSize] = useState<{
     width: number;
     height: number;
   }>({
@@ -38,7 +42,8 @@ const Profile: React.FC = () => {
         const userRef = doc(db, `users/${user.uid}`);
         const docSnap = await getDoc(userRef);
         if (docSnap.exists()) {
-          setProfilePicUrl(docSnap.data().profilePic || "");
+          const data = docSnap.data() as UserProfile;
+          setProfilePicUrl(data.profilePic || "");
         }
       };
       fetchProfilePic();
@@ -53,10 +58,7 @@ const Profile: React.FC = () => {
     }
   };
 
-  const handleCropComplete = async (
-    croppedArea: any,
-    croppedAreaPixels: any
-  ): Promise<void> => {
+  const handleCropComplete = async (croppedAreaPixels: any): Promise<void> => {
     try {
       const croppedImg = await getCroppedImg(image!, croppedAreaPixels);
       setCroppedImage(croppedImg);
