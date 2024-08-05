@@ -1,35 +1,24 @@
 // api/auth.js
-
 import { NextResponse } from 'next/server';
-import { getAuth } from 'firebase/auth';
-import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
+import { OAuth2Client } from 'google-auth-library';
 
-// Your Firebase configuration
-const firebaseConfig = {
-  apiKey: 'YOUR_API_KEY',
-  authDomain: 'YOUR_AUTH_DOMAIN',
-  projectId: 'YOUR_PROJECT_ID',
-  storageBucket: 'YOUR_STORAGE_BUCKET',
-  messagingSenderId: 'YOUR_MESSAGING_SENDER_ID',
-  appId: 'YOUR_APP_ID',
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID, process.env.GOOGLE_CLIENT_SECRET, 'https://finance-insight-psi.vercel.app/api/auth/callback');
 
 export async function GET(request) {
-  // Handle the Google login callback
+  const url = new URL(request.url);
+  const code = url.searchParams.get('code');
+
+  if (!code) {
+    return NextResponse.json({ error: 'Missing code' }, { status: 400 });
+  }
+
   try {
-    const url = new URL(request.url);
-    const code = url.searchParams.get('code'); // Or however you need to handle the response
-
-    // Handle the response, e.g., exchange code for tokens, etc.
-
-    return NextResponse.redirect('/dashboard'); // Redirect to a different page after successful login
+    const { tokens } = await client.getToken(code);
+    // Process tokens and store user session here
+    // Redirect to your frontend application
+    return NextResponse.redirect('/dashboard');
   } catch (error) {
-    console.error('Authentication error:', error);
-    return NextResponse.redirect('/error'); // Redirect to an error page if something goes wrong
+    console.error('Error exchanging code for tokens:', error);
+    return NextResponse.json({ error: 'Authentication failed' }, { status: 500 });
   }
 }
