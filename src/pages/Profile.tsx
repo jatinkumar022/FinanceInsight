@@ -59,6 +59,7 @@ const Profile: React.FC = () => {
   };
 
   const handleCropComplete = async (croppedAreaPixels: any): Promise<void> => {
+    console.log("Cropped area pixels:", croppedAreaPixels); // Add this line
     try {
       const croppedImg = await getCroppedImg(image!, croppedAreaPixels);
       setCroppedImage(croppedImg);
@@ -66,7 +67,6 @@ const Profile: React.FC = () => {
       console.error("Error cropping image:", error);
     }
   };
-
   const handleUpload = async (): Promise<void> => {
     if (!croppedImage || !user) return;
 
