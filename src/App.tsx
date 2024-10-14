@@ -31,6 +31,10 @@ const App: React.FC = () => {
         <Route
           path="/transaction"
           element={<ProtectedRoute element={<TableTransaction />} />}
+        />{" "}
+        <Route
+          path="/pr-policy"
+          element={<ProtectedRoute element={<TableTransaction />} />}
         />
       </Route>
     </Routes>
